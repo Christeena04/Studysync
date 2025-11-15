@@ -30,6 +30,7 @@ export default function DiscussionBoard({ roomId, user }) {
     const newRef = push(msgRef);
     await set(newRef, {
       user: user?.displayName || 'Anonymous',
+      email: user?.email || null,      // Added email for identification
       text: text.trim(),
       ts: Date.now(),
     });
@@ -222,7 +223,8 @@ export default function DiscussionBoard({ roomId, user }) {
               {Object.entries(messages)
                 .sort((a, b) => a[1].ts - b[1].ts)
                 .map(([id, msg]) => {
-                  const isCurrentUser = msg.user === (user?.displayName || 'Anonymous');
+                  const isCurrentUser = msg.email && user?.email && msg.email === user.email;
+
                   return (
                     <div
                       key={id}
