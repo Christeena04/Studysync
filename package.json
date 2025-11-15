@@ -1,8 +1,11 @@
-{
+
+  {
   "name": "studysync",
   "private": true,
   "version": "0.0.0",
+  "homepage": "https://christeena04.github.io/Studysync",
   "type": "module",
+
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
