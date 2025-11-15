@@ -11,7 +11,7 @@ const firebaseConfig = {
   authDomain: "studysync-9f257.firebaseapp.com",
   projectId: "studysync-9f257",
   databaseURL: "https://studysync-9f257-default-rtdb.asia-southeast1.firebasedatabase.app/",
-  storageBucket: "studysync-9f257.firebasestorage.app",
+  storageBucket: "studysync-9f257.appspot.com",
   messagingSenderId: "324809422879",
   appId: "1:324809422879:web:c1209a48a10e4c79323d2a",
   measurementId: "G-YTBKDMEMGE"
