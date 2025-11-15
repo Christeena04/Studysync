@@ -1,22 +1,39 @@
-import React, { useEffect, useState } from 'react';
-import RoomList from './components/RoomList';
-import StudyRoom from './components/StudyRoom';
+import { useEffect, useState } from 'react';
+import RoomList from './components/RoomList.jsx';
+import StudyRoom from './components/StudyRoom.jsx';
 import { auth, googleProvider } from './firebaseConfig';
 import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
-import { BookOpen, LogOut, LogIn, User } from 'lucide-react';
+import { BookOpen, LogOut, LogIn } from 'lucide-react';
 import './App.css';
 
-export default function App() {
-  const [user, setUser] = useState(null);
-  const [roomId, setRoomId] = useState(null);
+// ---- USER TYPE FIX ----
+interface UserType {
+  displayName?: string;
+  email?: string;
+  uid?: string;
+}
 
+export default function App() {
+  const [user, setUser] = useState<UserType | null>(null);
+  const [roomId, setRoomId] = useState<string | null>(null);
+
+  // Auth listener
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
-      setUser(u);
+    const unsub = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        setUser({
+          displayName: firebaseUser.displayName || "",
+          email: firebaseUser.email || "",
+          uid: firebaseUser.uid || "",
+        });
+      } else {
+        setUser(null);
+      }
     });
     return () => unsub();
   }, []);
 
+  // Login
   const login = async () => {
     try {
       await signInWithPopup(auth, googleProvider);
@@ -25,6 +42,7 @@ export default function App() {
     }
   };
 
+  // Logout
   const logout = async () => {
     await signOut(auth);
     setRoomId(null);
@@ -32,6 +50,7 @@ export default function App() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#f9fafb' }}>
+      
       {/* Navigation Header */}
       <header style={{
         background: 'white',
@@ -52,12 +71,9 @@ export default function App() {
             alignItems: 'center',
             height: '70px'
           }}>
+
             {/* Logo */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px'
-            }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{
                 width: '42px',
                 height: '42px',
@@ -70,24 +86,15 @@ export default function App() {
                 <BookOpen size={24} color="white" />
               </div>
               <div>
-                <h1 style={{
-                  fontSize: '24px',
-                  fontWeight: '700',
-                  color: '#1f2937',
-                  margin: 0
-                }}>
+                <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#1f2937', margin: 0 }}>
                   StudySync
                 </h1>
-                <p style={{
-                  fontSize: '12px',
-                  color: '#6b7280',
-                  margin: 0
-                }}>
+                <p style={{ fontSize: '12px', color: '#6b7280', margin: 0 }}>
                   Collaborative Learning
                 </p>
               </div>
             </div>
-            
+
             {/* User Section */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               {user ? (
@@ -115,14 +122,11 @@ export default function App() {
                     }}>
                       {user.displayName?.charAt(0)?.toUpperCase() || 'U'}
                     </div>
-                    <span style={{
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      color: '#374151'
-                    }}>
+                    <span style={{ fontSize: '14px', fontWeight: '500', color: '#374151' }}>
                       {user.displayName}
                     </span>
                   </div>
+
                   <button
                     onClick={logout}
                     style={{
@@ -137,15 +141,6 @@ export default function App() {
                       fontSize: '14px',
                       fontWeight: '600',
                       cursor: 'pointer',
-                      transition: 'all 0.2s'
-                    }}
-                    onMouseOver={(e) => {
-                      e.currentTarget.style.background = '#f9fafb';
-                      e.currentTarget.style.borderColor = '#d1d5db';
-                    }}
-                    onMouseOut={(e) => {
-                      e.currentTarget.style.background = 'white';
-                      e.currentTarget.style.borderColor = '#e5e7eb';
                     }}
                   >
                     <LogOut size={16} />
@@ -167,16 +162,14 @@ export default function App() {
                     fontSize: '15px',
                     fontWeight: '600',
                     cursor: 'pointer',
-                    transition: 'background 0.2s'
                   }}
-                  onMouseOver={(e) => e.currentTarget.style.background = '#5568d3'}
-                  onMouseOut={(e) => e.currentTarget.style.background = '#667eea'}
                 >
                   <LogIn size={18} />
                   <span>Sign in with Google</span>
                 </button>
               )}
             </div>
+
           </div>
         </div>
       </header>
@@ -184,7 +177,7 @@ export default function App() {
       {/* Main Content */}
       <main>
         {!roomId ? (
-          <RoomList onJoin={(id) => setRoomId(id)} user={user} />
+          <RoomList onJoin={(id: string) => setRoomId(id)} user={user} />
         ) : (
           <StudyRoom roomId={roomId} user={user} onLeave={() => setRoomId(null)} />
         )}
@@ -225,42 +218,15 @@ export default function App() {
               fontSize: '14px',
               color: '#6b7280'
             }}>
-              <a href="#" style={{
-                color: '#6b7280',
-                textDecoration: 'none',
-                transition: 'color 0.2s'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.color = '#667eea'}
-              onMouseOut={(e) => e.currentTarget.style.color = '#6b7280'}
-              >About</a>
-              <a href="#" style={{
-                color: '#6b7280',
-                textDecoration: 'none',
-                transition: 'color 0.2s'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.color = '#667eea'}
-              onMouseOut={(e) => e.currentTarget.style.color = '#6b7280'}
-              >Privacy</a>
-              <a href="#" style={{
-                color: '#6b7280',
-                textDecoration: 'none',
-                transition: 'color 0.2s'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.color = '#667eea'}
-              onMouseOut={(e) => e.currentTarget.style.color = '#6b7280'}
-              >Terms</a>
-              <a href="#" style={{
-                color: '#6b7280',
-                textDecoration: 'none',
-                transition: 'color 0.2s'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.color = '#667eea'}
-              onMouseOut={(e) => e.currentTarget.style.color = '#6b7280'}
-              >Contact</a>
+              <a href="#" style={{ color: '#6b7280', textDecoration: 'none' }}>About</a>
+              <a href="#" style={{ color: '#6b7280', textDecoration: 'none' }}>Privacy</a>
+              <a href="#" style={{ color: '#6b7280', textDecoration: 'none' }}>Terms</a>
+              <a href="#" style={{ color: '#6b7280', textDecoration: 'none' }}>Contact</a>
             </div>
           </div>
         </div>
       </footer>
+
     </div>
   );
 }
